@@ -1,16 +1,22 @@
-package lab3;
+/*
+ * The code executes basic login system for school library
+ * midterm and final exam score given by user
+ * 
+ * @author Osman Efe Kara (22401817)
+ * @version 15/10/2025 08.45
+ */
 
 import java.util.Scanner;
 
-public class Lab03_Q3 {
+public class Lab03_Revision_Q3 {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        // --- Login bilgileri ---
+        // --- Login ---
         final String USERNAME_STORED = "librarian";
-        final String PASSWORD_STORED = "books2024";
+        String PASSWORD_STORED = "books2024";
 
-        // --- Başlangıç üyeler ve kitaplar ---
+        // --- Predefined members and books ---
         String members = "JohnSmith, EmilyDavis, ZeynepDemir, ";
         String books = "ISBN9781:JavaProgramming ISBN9782:DataStructures ";
 
@@ -23,15 +29,16 @@ public class Lab03_Q3 {
             String password = input.nextLine();
 
             if (password.equals(PASSWORD_STORED)) {
-                // --- Menü ---
+                // --- Menu ---
                 System.out.println("1- Add member");
                 System.out.println("2- Delete member");
                 System.out.println("3- Add book");
                 System.out.println("4- Delete book");
-                System.out.println("5- Logout");
+                System.out.println("5- Add Credentials");
+                System.out.println("6- Logout");
                 System.out.print("Select an operation: ");
                 int choice = input.nextInt();
-                input.nextLine(); // buffer temizliği
+                input.nextLine();
 
                 if (choice == 1) {
                     System.out.println("-- Add Member --");
@@ -46,8 +53,7 @@ public class Lab03_Q3 {
                     }
 
                     System.out.println("Your members: (" + members + ")");
-                } 
-                else if (choice == 2) {
+                } else if (choice == 2) {
                     System.out.println("-- Delete Member --");
                     System.out.print("Enter member name which you want to delete: ");
                     String delMember = input.nextLine();
@@ -60,24 +66,22 @@ public class Lab03_Q3 {
                     }
 
                     System.out.println("Your members: (" + members + ")");
-                } 
-                else if (choice == 3) {
+                } else if (choice == 3) {
                     System.out.println("-- Add Book --");
                     System.out.print("Enter book name: ");
                     String newBookName = input.nextLine();
 
-                    // Math.random() ile benzersiz ISBN oluştur (9000–9999 arası)
                     int isbn;
                     while (true) {
-                        isbn = 9000 + (int)(Math.random() * 1000);
-                        if (!books.contains("ISBN" + isbn)) break;
+                        isbn = 9000 + (int) (Math.random() * 1000);
+                        if (!books.contains("ISBN" + isbn))
+                            break;
                     }
 
                     books += "ISBN" + isbn + ":" + newBookName + " ";
                     System.out.println("New book with ISBN " + isbn + " is added!");
                     System.out.println("Your books: " + books);
-                } 
-                else if (choice == 4) {
+                } else if (choice == 4) {
                     System.out.println("-- Delete Book --");
                     System.out.print("Enter ISBN which you want to delete: ");
                     String deleteISBN = input.nextLine();
@@ -85,7 +89,8 @@ public class Lab03_Q3 {
                     if (books.contains("ISBN" + deleteISBN)) {
                         int start = books.indexOf("ISBN" + deleteISBN);
                         int end = books.indexOf(" ", start);
-                        if (end == -1) end = books.length();
+                        if (end == -1)
+                            end = books.length();
                         String toDelete = books.substring(start, end).trim();
                         books = books.replace(toDelete, "").trim();
                         System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
@@ -94,11 +99,28 @@ public class Lab03_Q3 {
                     }
 
                     System.out.println("Your books: " + books);
-                } 
-                else if (choice == 5) {
+                } else if (choice == 5) {
+                    System.out.println("-- Change Credentials --");
+                    System.out.println("1- Change username");
+                    System.out.println("2- Change password");
+                    System.out.println("Select an option : ");
+                    
+                    if (choice == 1) {
+                        System.out.print("Enter your new username : ");
+                        String newusername = input.nextLine();
+                        System.out.println("Your new username" + newusername);
+                    }
+                    else if(choice==2){
+                        System.out.println("Enter your new password : ");
+                        String newpassword=input.nextLine();
+                        System.out.println("Your new password" + newpassword);
+                    }
+                        
+
+                    
+                } else if (choice == 6) {
                     System.out.println("Logged out successfully!");
-                } 
-                else {
+                } else {
                     System.out.println("Invalid selection!");
                 }
             } else {
