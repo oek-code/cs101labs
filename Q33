@@ -1,10 +1,15 @@
+System.out.println("-- Add Book --");
+System.out.print("Enter book name: ");
+String newBookName = input.nextLine();
+
 int isbn = 9000 + (int)(Math.random() * 1000);
 
-// 1000 kez deneme hakkı
-for (int i = 0; i < 1000; i++) {
-    if (!books.contains("ISBN" + isbn)) {
-        // benzersiz ISBN bulundu
-        break;  // bu break sadece for'dan çıkmak için
-    }
-    isbn = 9000 + (int)(Math.random() * 1000);
+// Eğer ISBN zaten varsa, kullanıcıya mesaj ver
+if (books.contains("ISBN" + isbn)) {
+    System.out.println("Random ISBN conflict! Try again later.");
+} else {
+    books = books + "ISBN" + isbn + ":" + newBookName + " ";
+    System.out.println("New book with ISBN " + isbn + " is added!");
 }
+
+System.out.println("Your books: " + books);
