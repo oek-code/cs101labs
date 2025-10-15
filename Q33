@@ -1,34 +1,58 @@
-Now modify the delete book operation such that if the user has no books but still tries to use the
+import java.util.Scanner;
 
-user books to an empty strin
+public class Lab03_Q1 {
+    public static void main(String[] args) {
 
+        // Inputs
+        Scanner reader = new Scanner(System.in);
+        System.out.print("Enter your midterm score : ");
+        int midtermScore = reader.nextInt();
+        System.out.print("Enter your final exam score : ");
+        int finalScore = reader.nextInt();
+        double averageGrade = (midtermScore * 0.4) + (finalScore * 0.6);
+        reader.close();
 
-else if (choice == 2) {
-    System.out.println("-- Delete Member --");
-    System.out.print("Enter member name which you want to delete: ");
-    String delMember = input.nextLine();
+        String letterGrade;
+        boolean passed;
 
-    // Üye varsa sil, yoksa uyar
-    int start = members.indexOf(delMember);
+        // Final exam statement
+        if (finalScore < 50) {
+            letterGrade = "FF";
+            passed = false;
 
-    if (start != -1) { // bulunduysa
-        int end = start + delMember.length() + 2; // ", " kısmını da dahil et
-        if (end > members.length()) {
-            end = members.length();
+            System.out.println("Your letter grade is : " + letterGrade);
+            System.out.printf("Your average is : " + "%.1f\n", averageGrade);
+            System.out.println("You failed the course due to insufficient final exam score.");
+            
+        } else {
+            // Determine letter grade based on average
+            if (averageGrade >= 90)
+                letterGrade = "AA";
+            else if (averageGrade >= 85)
+                letterGrade = "BA";
+            else if (averageGrade >= 80)
+                letterGrade = "BB";
+            else if (averageGrade >= 75)
+                letterGrade = "CB";
+            else if (averageGrade >= 70)
+                letterGrade = "CC";
+            else if (averageGrade >= 60)
+                letterGrade = "DC";
+            else if (averageGrade >= 50)
+                letterGrade = "DD";
+            else
+                letterGrade = "FF";
+
+            // Outputs
         }
+        passed = (!letterGrade.equals("FF"));
+        System.out.printf("Your average is  : " + "%.1f\n", averageGrade);
+        System.out.println("Your letter grade is : " + letterGrade);
+        if (passed) {
+            System.out.println("You passed the course successfully. Congratulations!");
+        } else {
+            System.out.println("You failed the course.");
 
-        // delMember'dan önceki kısım + sonraki kısım
-        String before = members.substring(0, start);
-        String after = members.substring(end);
-
-        // Yeni listeyi birleştir
-        members = before + after;
-
-        System.out.println(delMember + " is deleted successfully from members!");
-    } else {
-        System.out.println("You don't have any member whose name is " + delMember + "!");
+        }
     }
-
-    System.out.println("Your members: (" + members + ")");
 }
-
