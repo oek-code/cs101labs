@@ -1,15 +1,28 @@
-System.out.println("-- Add Book --");
-System.out.print("Enter book name: ");
-String newBookName = input.nextLine();
+ else if (choice == 4) {
 
-int isbn = 9000 + (int)(Math.random() * 1000);
+                    System.out.println("-- Delete Book --");
+                    if (books.isEmpty()) {
+                        System.out.println("You don't have any books!");
+                        System.out.println("Your books : " + books);
+                        
+                    } else
+                        System.out.print("Enter ISBN which you want to delete: ");
+                    String deleteISBN = input.nextLine();
 
-// Eğer ISBN zaten varsa, kullanıcıya mesaj ver
-if (books.contains("ISBN" + isbn)) {
-    System.out.println("Random ISBN conflict! Try again later.");
-} else {
-    books = books + "ISBN" + isbn + ":" + newBookName + " ";
-    System.out.println("New book with ISBN " + isbn + " is added!");
-}
+                    if (books.contains("ISBN" + deleteISBN)) {
+                        int begin = books.indexOf("ISBN" + deleteISBN);
+                        int end = books.indexOf(" ", begin);
+                        if (end == -1)
+                            end = books.length();
 
-System.out.println("Your books: " + books);
+                        String before = books.substring(0, begin);
+                        String after = books.substring(end);
+
+                        books = before + after;
+
+                        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
+                    } else {
+                        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
+                    }
+
+                    System.out.println("Your books: " + books);
