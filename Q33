@@ -1,28 +1,22 @@
- else if (choice == 4) {
+else {
+    System.out.print("Enter ISBN which you want to delete: ");
+    String deleteISBN = input.nextLine();
 
-                    System.out.println("-- Delete Book --");
-                    if (books.isEmpty()) {
-                        System.out.println("You don't have any books!");
-                        System.out.println("Your books : " + books);
-                        
-                    } else
-                        System.out.print("Enter ISBN which you want to delete: ");
-                    String deleteISBN = input.nextLine();
+    if (books.contains("ISBN" + deleteISBN)) {
+        int begin = books.indexOf("ISBN" + deleteISBN);
+        int end = books.indexOf(" ", begin);
+        if (end == -1)
+            end = books.length();
 
-                    if (books.contains("ISBN" + deleteISBN)) {
-                        int begin = books.indexOf("ISBN" + deleteISBN);
-                        int end = books.indexOf(" ", begin);
-                        if (end == -1)
-                            end = books.length();
+        String before = books.substring(0, begin);
+        String after = books.substring(end);
 
-                        String before = books.substring(0, begin);
-                        String after = books.substring(end);
+        books = before + after;
 
-                        books = before + after;
+        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
+    } else {
+        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
+    }
 
-                        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
-                    } else {
-                        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
-                    }
-
-                    System.out.println("Your books: " + books);
+    System.out.println("Your books: " + books);
+}
