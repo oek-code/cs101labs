@@ -1,117 +1,29 @@
-import java.util.Scanner;
+else if (choice == 4) {
+    System.out.println("-- Delete Book --");
+    System.out.print("Enter ISBN which you want to delete: ");
+    String deleteISBN = input.nextLine();
 
-public class Lab03_Q3 {
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+    // Eğer books boşsa
+    if (books.trim().isEmpty()) {
+        System.out.println("You don't have any books!");
+        System.out.println("Your books: ");
+    } 
+    else if (books.contains("ISBN" + deleteISBN)) {
+        int begin = books.indexOf("ISBN" + deleteISBN);
+        int end = books.indexOf(" ", begin);
+        if (end == -1) end = books.length();
 
-        // --- Login ---
-       final String USERNAME_STORED = "librarian";
-        String PASSWORD_STORED = "books2024";
+        // Silinecek kısmın öncesi ve sonrası
+        String before = books.substring(0, begin);
+        String after = books.substring(end);
 
-        // --- Predefined members and books ---
-        String members = "JohnSmith, EmilyDavis, ZeynepDemir, ";
-        String books = "ISBN9781:JavaProgramming ISBN9782:DataStructures ";
+        // Yeni books
+        books = before + after;
 
-        // --- Login ---
-        System.out.print("Enter your username: ");
-        String username = input.nextLine();
-
-        if (username.equals(USERNAME_STORED)) {
-            System.out.print("Enter your password: ");
-            String password = input.nextLine();
-
-            if (password.equals(PASSWORD_STORED)) {
-                // --- Menü ---
-                System.out.println("1- Add member");
-                System.out.println("2- Delete member");
-                System.out.println("3- Add book");
-                System.out.println("4- Delete book");
-                System.out.println("5- Logout");
-                System.out.print("Select an operation: ");
-                int choice = input.nextInt();
-                input.nextLine(); 
-
-                if (choice == 1) {
-                    System.out.println("-- Add Member --");
-                    System.out.print("Enter member name: ");
-                    String newMember = input.nextLine();
-
-                    if (members.contains(newMember + ",")) {
-                        System.out.println("This member is already in your list!");
-                    } else {
-                        members += newMember + ", ";
-                        System.out.println("New member " + newMember + " is added!");
-                    }
-
-                    System.out.println("Your members: (" + members + ")");
-                } 
-                else if (choice == 2) {
-                    System.out.println("-- Delete Member --");
-                    System.out.print("Enter member name which you want to delete: ");
-                    String delMember = input.nextLine();
-
-                    int start = members.indexOf(delMember);
-
-                    if (start != -1) {
-                        int end = start + delMember.length() + 2;
-
-                        String before = members.substring(0, start);
-                        String after = members.substring(end);
-
-                        members = before + after;
-
-                        System.out.println(delMember + " is deleted successfully from members!");
-                    } else {
-                        System.out.println("You don't have any member whose name is " + delMember + "!");
-                    }
-                } 
-                else if (choice == 3) {
-                    System.out.println("-- Add Book --");
-                    System.out.print("Enter book name: ");
-                    String newBookName = input.nextLine();
-
-                    
-                    int isbn;
-                    while (true) {
-                        isbn = 9000 + (int)(Math.random() * 1000);
-                        if (!books.contains("ISBN" + isbn)) break;
-                    }
-
-                    books += "ISBN" + isbn + ":" + newBookName + " ";
-                    System.out.println("New book with ISBN " + isbn + " is added!");
-                    System.out.println("Your books: " + books);
-                } 
-                else if (choice == 4) {
-                    System.out.println("-- Delete Book --");
-                    System.out.print("Enter ISBN which you want to delete: ");
-                    String deleteISBN = input.nextLine();
-
-                    if (books.contains("ISBN" + deleteISBN)) {
-                        int begin = books.indexOf("ISBN" + deleteISBN);
-                        int end = books.indexOf(" ", begin);
-                        if (end == -1) end = books.length();
-                        String toDelete = books.substring(begin, end).trim();
-                        books = books.replace(toDelete, "").trim();
-                        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
-                    } else {
-                        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
-                    }
-
-                    System.out.println("Your books: " + books);
-                } 
-                else if (choice == 5) {
-                    System.out.println("Logged out successfully!");
-                } 
-                else {
-                    System.out.println("Invalid selection!");
-                }
-            } else {
-                System.out.println("Incorrect password! Goodbye!");
-            }
-        } else {
-            System.out.println("Username not found! Goodbye!");
-        }
-
-        input.close();
+        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
+        System.out.println("Your books: " + books);
+    } else {
+        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
+        System.out.println("Your books: " + books);
     }
 }
