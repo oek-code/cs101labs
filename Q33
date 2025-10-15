@@ -1,29 +1,10 @@
-else if (choice == 4) {
-    System.out.println("-- Delete Book --");
-    System.out.print("Enter ISBN which you want to delete: ");
-    String deleteISBN = input.nextLine();
+int isbn = 9000 + (int)(Math.random() * 1000);
 
-    // Eğer books boşsa
-    if (books.trim().isEmpty()) {
-        System.out.println("You don't have any books!");
-        System.out.println("Your books: ");
-    } 
-    else if (books.contains("ISBN" + deleteISBN)) {
-        int begin = books.indexOf("ISBN" + deleteISBN);
-        int end = books.indexOf(" ", begin);
-        if (end == -1) end = books.length();
-
-        // Silinecek kısmın öncesi ve sonrası
-        String before = books.substring(0, begin);
-        String after = books.substring(end);
-
-        // Yeni books
-        books = before + after;
-
-        System.out.println("The book with the ISBN " + deleteISBN + " is deleted successfully!");
-        System.out.println("Your books: " + books);
-    } else {
-        System.out.println("You don't have any book with the ISBN " + deleteISBN + "!");
-        System.out.println("Your books: " + books);
+// 1000 kez deneme hakkı
+for (int i = 0; i < 1000; i++) {
+    if (!books.contains("ISBN" + isbn)) {
+        // benzersiz ISBN bulundu
+        break;  // bu break sadece for'dan çıkmak için
     }
+    isbn = 9000 + (int)(Math.random() * 1000);
 }
