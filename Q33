@@ -3,29 +3,24 @@ import java.util.Scanner;
 public class Lab03_Q1 {
     public static void main(String[] args) {
 
-        // Inputs
         Scanner reader = new Scanner(System.in);
+
         System.out.print("Enter your midterm score : ");
         int midtermScore = reader.nextInt();
         System.out.print("Enter your final exam score : ");
         int finalScore = reader.nextInt();
+
         double averageGrade = (midtermScore * 0.4) + (finalScore * 0.6);
         reader.close();
 
         String letterGrade;
         boolean passed;
 
-        // Final exam statement
+        // Öncelikle final < 50 ise FF
         if (finalScore < 50) {
             letterGrade = "FF";
-            passed = false;
-
-            System.out.println("Your letter grade is : " + letterGrade);
-            System.out.printf("Your average is : " + "%.1f\n", averageGrade);
-            System.out.println("You failed the course due to insufficient final exam score.");
-            
         } else {
-            // Determine letter grade based on average
+            // Ortalama üzerinden harf notu belirleme
             if (averageGrade >= 90)
                 letterGrade = "AA";
             else if (averageGrade >= 85)
@@ -42,17 +37,21 @@ public class Lab03_Q1 {
                 letterGrade = "DD";
             else
                 letterGrade = "FF";
-
-            // Outputs
         }
-        passed = (!letterGrade.equals("FF"));
-        System.out.printf("Your average is  : " + "%.1f\n", averageGrade);
+
+        // Başarı durumu
+        passed = !letterGrade.equals("FF");
+
+        // Çıktılar tek noktadan
+        System.out.printf("Your average is  : %.1f\n", averageGrade);
         System.out.println("Your letter grade is : " + letterGrade);
+
         if (passed) {
             System.out.println("You passed the course successfully. Congratulations!");
+        } else if (finalScore < 50) {
+            System.out.println("You failed the course due to insufficient final exam score.");
         } else {
             System.out.println("You failed the course.");
-
         }
     }
 }
