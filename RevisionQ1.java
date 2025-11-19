@@ -1,4 +1,4 @@
-
+package lab6;
 import java.util.Scanner;
 
 public class Lab06_Q1_Revision {
@@ -15,6 +15,7 @@ public class Lab06_Q1_Revision {
 
         char[][] seats = new char[r][c];
 
+        // Tüm koltukları '-' ile doldur
         int i = 0;
         while (i < r) {
             int j = 0;
@@ -25,34 +26,30 @@ public class Lab06_Q1_Revision {
             i++;
         }
 
-        in.nextLine(); // buffer temizliği
+        in.nextLine(); // nextInt tampon temizleme
         boolean error = false;
 
-        // =============================
-        //   ROW BY ROW COMMA INPUT
-        // =============================
+        // ==========================
+        //   1) GRUP GİRİŞİ (split)
+        // ==========================
         int row = 0;
         while (row < r) {
 
-            System.out.print("Enter groups for row " + (row+1) + ": ");
+            System.out.print("Enter groups for row " + (row + 1) + ": ");
             String line = in.nextLine();
 
-            // Virgülle böl → split serbest
-            String[] parts = line.split(",");
-
-            // Her part → integer
+            String[] parts = line.split(",");  // virgülle böl
             int groupCount = parts.length;
             int[] groups = new int[groupCount];
 
-            int k = 0;
-            while (k < groupCount) {
-                groups[k] = Integer.parseInt(parts[k].trim());
-                k++;
+            // parçaları sayılara çevir
+            int a = 0;
+            while (a < groupCount) {
+                groups[a] = Integer.parseInt(parts[a].trim());
+                a++;
             }
 
-            // -------------------------
-            //   CAPACITY CHECK
-            // -------------------------
+            // toplam kişi sayısı
             int totalPeople = 0;
             int g = 0;
             while (g < groupCount) {
@@ -60,28 +57,31 @@ public class Lab06_Q1_Revision {
                 g++;
             }
 
+            // gerekli minimum boşluk (grup sayısı - 1)
             int neededSpaces = 0;
             if (groupCount > 1) {
-                neededSpaces = groupCount - 1; // aralara 1 boşluk
+                neededSpaces = groupCount - 1;
             }
 
-            if (totalPeople + neededSpaces > c) {
-                System.out.println("Error: groups exceed columns in row " + (row+1));
+            // kapasite yetmiyorsa ERROR
+            if (!error && totalPeople + neededSpaces > c) {
+                System.out.println("Error: groups exceed columns in row " + (row + 1));
                 error = true;
             }
 
-            // -------------------------
-            //   PLACE GROUPS IF NO ERROR
-            // -------------------------
+            // ==========================
+            //   2) KOLTUKLARA YERLEŞTİR
+            // ==========================
             if (!error) {
 
                 int pos = 0;
+                int gi = 0;
 
-                int gIndex = 0;
-                while (gIndex < groupCount) {
+                while (gi < groupCount) {
 
-                    // group size kadar x koy
-                    int people = groups[gIndex];
+                    int people = groups[gi];
+
+                    // grup kadar x koy
                     int t = 0;
                     while (t < people) {
                         seats[row][pos] = 'x';
@@ -89,28 +89,27 @@ public class Lab06_Q1_Revision {
                         t++;
                     }
 
-                    // son grup değilse → 1 boşluk
-                    if (gIndex < groupCount - 1) {
+                    // son grup değilse ve yer varsa 1 boşluk
+                    if (gi < groupCount - 1 && pos < c) {
                         seats[row][pos] = '-';
                         pos++;
                     }
 
-                    gIndex++;
+                    gi++;
                 }
             }
 
             row++;
         }
 
-        // Eğer baştan itibaren hata yoksa, seating yazılır
+        // ilk yerleşim sonucu yazdır
         if (!error) {
             printSeats(seats, r, c);
         }
 
-        // ==================================
-        //        SHIFT İŞLEMİ
-        // ==================================
-
+        // ==========================
+        //   3) SHIFT İŞLEMİ
+        // ==========================
         if (!error) {
 
             System.out.print("Do you want to shift a row (y/n)? ");
@@ -127,9 +126,7 @@ public class Lab06_Q1_Revision {
 
                 boolean canShift = true;
 
-                // -----------------------------
-                //        SHIFT LEFT
-                // -----------------------------
+                // === LEFT SHIFT ===
                 if (dir.equalsIgnoreCase("L")) {
 
                     int j = 0;
@@ -150,10 +147,8 @@ public class Lab06_Q1_Revision {
                     }
                 }
 
-                // -----------------------------
-                //        SHIFT RIGHT
-                // -----------------------------
-                else {
+                // === RIGHT SHIFT ===
+                else if (dir.equalsIgnoreCase("R")) {
 
                     int j = 0;
                     while (j < c) {
@@ -173,6 +168,11 @@ public class Lab06_Q1_Revision {
                     }
                 }
 
+                else {
+                    System.out.println("Invalid direction.");
+                    canShift = false;
+                }
+
                 if (!canShift) {
                     System.out.println("Shift not possible (would move seats out of bounds).");
                 } else {
@@ -184,6 +184,7 @@ public class Lab06_Q1_Revision {
         in.close();
     }
 
+    // Koltuk çıktısı
     public static void printSeats(char[][] seats, int r, int c) {
         int i = 0;
         while (i < r) {
@@ -196,5 +197,4 @@ public class Lab06_Q1_Revision {
             i++;
         }
     }
-
 }
