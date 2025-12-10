@@ -1,12 +1,26 @@
-package lab8;
+public void spawnHealthStones() {
+    int attempts = 0;
+    boolean placed = false; // Taşı koyup koymadığımızı takip eden bayrak (flag)
 
-public class HealthStone extends Entity {
-    public HealthStone (int x, int y){
-        super(x, y, '+');
+    // "Taş henüz KOYULMADIYSA" (!placed) VE "Deneme hakkı bitmediyse" döngü döner
+    while (!placed && attempts < 10) {
+        int randomX = random.nextInt(GameEngineRev.WIDTH);
+        boolean occupied = false;
+
+        // Çakışma kontrolü
+        for (Enemy e : enemies) {
+            if (e.getX() == randomX && e.getY() == 0) {
+                occupied = true;
+                // İç döngüden çıkmak istersen buraya break koyabilirsin, 
+                // ama koymazsan da sadece işlemciyi biraz fazla yorar, kod çalışır.
+            }
+        }
+
+        if (!occupied) {
+            healthStones.add(new HealthStone(randomX, 0));
+            placed = true; // Durumu 'true' yapıyoruz, böylece while döngüsü bir sonraki turda duracak.
+        }
         
+        attempts++;
     }
-    public void update() {
-        this.y--;    }
-    
-    
 }
