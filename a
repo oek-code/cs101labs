@@ -1,0 +1,12 @@
+package lab8;
+
+public class HealthStone extends Entity {
+    public HealthStone (int x, int y){
+        super(x, y, '+');
+        
+    }
+    public void update() {
+        this.y--;    }
+    
+    
+}
