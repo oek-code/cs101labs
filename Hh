@@ -1,0 +1,187 @@
+import java.util.*;
+
+public class GameGridRev extends GameGrid {
+    // Semboller
+    public static String HERO_SYMBOL = "😍";
+    public static String RANDOM_MONSTER_SYMBOL = "👿";
+    public static String CHASING_MONSTER_SYMBOL = "👹";
+    public static String HEALTH_BONUS_SYMBOL = "💛";
+    public static String SCORE_BONUS_SYMBOL = "💰";
+    public static String FINISH_SYMBOL = "🏁"; 
+    
+    // Değişkenler (Shadowing)
+    private int width, height; 
+    private ArrayList<GameObject> objects; 
+    private ArrayList<GameObject> queuedObjectsForRemoval;
+
+    public GameGridRev(int width, int height) {
+        super(width, height); 
+        this.width = width;
+        this.height = height;
+        this.objects = new ArrayList<>();
+        this.objects.add(new Hero(this, 0, 0));
+        this.queuedObjectsForRemoval = new ArrayList<>();
+    }
+
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public Hero getHero() { return (Hero)this.objects.get(0); }
+    
+    public boolean isAtTarget(int row, int col) {
+        return (row == height - 1 && col == width - 1);
+    }
+
+    public void removeGameObject(GameObject obj) {
+        this.queuedObjectsForRemoval.add(obj);
+    }
+
+    private void addGameObject(GameObject obj) {
+        objects.add(obj);
+    }
+
+    public void spawnBonus(int row, int col) {
+        Bonus bonus;
+        if (Math.random() < 0.5) {
+            bonus = new HealthBonusRev(this, row, col);
+        } else {
+            bonus = new ScoreBonusRev(this, row, col);
+        }
+        addGameObject(bonus);
+    }
+
+    public void spawnMonster(int row, int col) {
+        Monster monster;
+        if (Math.random() < 0.5) {
+            monster = new RandomMonster(this, row, col);
+        } else {
+            monster = new ChasingMonster(this, row, col);
+        }
+        addGameObject(monster);
+    }
+
+    public void spawnGameObject() {
+        int row, col;
+        do {
+            row = (int)(Math.random() * height);
+            col = (int)(Math.random() * width);
+        } while (isOccupied(row,col));
+
+        if (Math.random() < 0.5) {
+            spawnMonster(row, col);
+        } else {
+            spawnBonus(row, col);
+        }
+    }
+
+    public boolean isOccupied(int row, int col) {
+        boolean occupied = false;
+        for (GameObject obj : objects) {
+            if (obj.getRow() == row && obj.getCol() == col) {
+                occupied = true;
+            }
+        }
+        return occupied;
+    }
+
+    public void draw() {
+        for (int i = 0; i < width; i++) System.out.print("----");
+        System.out.println("-");
+
+        for (int r = 0; r < height; r++) {
+            System.out.print("|"); 
+            for (int c = 0; c < width; c++) {
+                List<GameObject> cellObjects = new ArrayList<>();
+                for (GameObject obj : objects) {
+                    if (obj.getRow() == r && obj.getCol() == c) {
+                        cellObjects.add(obj);
+                    }
+                }
+
+                if (!cellObjects.isEmpty()) {
+                    int printedCount = 0;
+                    for (GameObject obj : cellObjects) {
+                        if (printedCount < 3) {
+                            System.out.print(turnPretty(obj.getSymbol()));
+                            printedCount++;
+                        }
+                    }
+                    while (printedCount < 3) {
+                        System.out.print(" ");
+                        printedCount++;
+                    }
+                } else {
+                    // --- BAYRAK AYARI ---
+                    if (r == height - 1 && c == width - 1) {
+                        // Bayrak 2 birim yer kaplar, başına 1 boşluk koyarsak toplam 3 birim olur.
+                        // Böylece sağdaki çizgi kaymaz.
+                        System.out.print(" " + FINISH_SYMBOL); 
+                    } else {
+                        System.out.print("   "); // 3 boşluk
+                    }
+                }
+                
+                System.out.print("|"); 
+            }
+            System.out.println();
+            for (int i = 0; i < width; i++) System.out.print("----");
+            System.out.println("-");
+        }
+        
+        Hero h = getHero();
+        System.out.println("Health: " + h.getHealth() + " Score: " + h.getScore());
+    }
+
+    public static String turnPretty(char c) {
+        if (c == 'P') return HERO_SYMBOL;
+        else if (c == 'R') return RANDOM_MONSTER_SYMBOL;
+        else if (c == 'C') return CHASING_MONSTER_SYMBOL;
+        else if (c == 'H') return HEALTH_BONUS_SYMBOL;
+        else if (c == 'S') return SCORE_BONUS_SYMBOL;
+        return Character.toString(c);
+    }
+
+    public void update() {
+        for (GameObject obj : objects) {
+            obj.move();
+        }
+    }
+
+    public void checkAndHandleCollisions() {
+        Hero hero = getHero();
+
+        // 1. Hero vs Others
+        for (GameObject obj : objects) {
+            if (obj != hero) {
+                if (obj.getRow() == hero.getRow() && obj.getCol() == hero.getCol()) {
+                    hero.handleCollision(obj);
+                }
+            }
+        }
+        removeQueuedObjects();
+
+        // 2. Others vs Others
+        // Canavarların birbirini yemesi engeli KALDIRILDI (Eski haline döndü)
+        for (int i = 1; i < objects.size(); i++) { 
+            for (int j = i + 1; j < objects.size(); j++) {
+                GameObject o1 = objects.get(i);
+                GameObject o2 = objects.get(j);
+
+                if (o1.getRow() == o2.getRow() && o1.getCol() == o2.getCol()) {
+                    if (GameObject.doesSurviveOnCollision(o1, o2)) {
+                        removeGameObject(o2);
+                    } else {
+                        removeGameObject(o1);
+                    }
+                }
+            }
+        }
+        removeQueuedObjects();
+    }
+
+    public void removeQueuedObjects() {
+        for (GameObject obj : queuedObjectsForRemoval) {
+            this.objects.remove(obj);
+        }
+        queuedObjectsForRemoval.clear();
+    }
+}
