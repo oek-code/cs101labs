@@ -1,0 +1,271 @@
+public class ScoreBonusRev extends ScoreBonus {
+    private int lifetime;
+
+    public ScoreBonusRev(GameGrid grid, int row, int col) {
+        super(grid, row, col);
+        // Ömür 3 ile 10 arasında rastgele belirlenir
+        // Math.random() * 8 -> 0 ile 7.99... + 3 -> 3 ile 10.99...
+        this.lifetime = (int)(Math.random() * 8) + 3;
+    }
+
+    // Bonus normalde hareket etmez ama move metodu her tur çağrıldığı için
+    // sayaç mantığını buraya kuruyoruz.
+    public void move() {
+        if (lifetime > 0) {
+            lifetime--;
+        }
+        
+        if (lifetime <= 0) {
+            // Süre bitti, ekrana yaz ve yok et
+            System.out.println(" " + GameGridRev.turnPretty(symbol) + " expired!");
+            grid.removeGameObject(this);
+        }
+    }
+}
+ public class HealthBonusRev extends HealthBonus {
+    private int lifetime;
+
+    public HealthBonusRev(GameGrid grid, int row, int col) {
+        super(grid, row, col);
+        this.lifetime = (int)(Math.random() * 8) + 3;
+    }
+
+    public void move() {
+        if (lifetime > 0) {
+            lifetime--;
+        }
+
+        if (lifetime <= 0) {
+            System.out.println(" " + GameGridRev.turnPretty(symbol) + " expired!");
+            grid.removeGameObject(this);
+        }
+    }
+}
+import java.util.*;
+
+public class GameGridRev extends GameGrid {
+    // Semboller (UTF-8 destekli)
+    public static String HERO_SYMBOL = "😍";
+    public static String RANDOM_MONSTER_SYMBOL = "👿";
+    public static String CHASING_MONSTER_SYMBOL = "👹";
+    public static String HEALTH_BONUS_SYMBOL = "💛";
+    public static String SCORE_BONUS_SYMBOL = "💰";
+    
+    // Değişkenleri tekrar tanımlıyoruz (Shadowing) çünkü parent class'takiler private
+    private int width, height; 
+    private ArrayList<GameObject> objects; 
+    private ArrayList<GameObject> queuedObjectsForRemoval;
+
+    public GameGridRev(int width, int height) {
+        super(width, height); // Parent constructor'ı susturmak için
+        this.width = width;
+        this.height = height;
+        this.objects = new ArrayList<>();
+        // Hero her zaman ilk eleman
+        this.objects.add(new Hero(this, 0, 0));
+        this.queuedObjectsForRemoval = new ArrayList<>();
+    }
+
+    // Getterlar artık bizim yeni listemizi kullanmalı
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public Hero getHero() { return (Hero)this.objects.get(0); }
+    
+    public boolean isAtTarget(int row, int col) {
+        return (row == height - 1 && col == width - 1);
+    }
+
+    public void removeGameObject(GameObject obj) {
+        this.queuedObjectsForRemoval.add(obj);
+    }
+
+    // Private olduğu için tekrar yazdık
+    private void addGameObject(GameObject obj) {
+        objects.add(obj);
+    }
+
+    // --- ÖNEMLİ DEĞİŞİKLİK BURADA ---
+    // Artık normal Bonus yerine Rev versiyonlarını üretiyoruz
+    public void spawnBonus(int row, int col) {
+        Bonus bonus;
+        if (Math.random() < 0.5) {
+            bonus = new HealthBonusRev(this, row, col);
+        } else {
+            bonus = new ScoreBonusRev(this, row, col);
+        }
+        addGameObject(bonus);
+    }
+    // -------------------------------
+
+    public void spawnMonster(int row, int col) {
+        Monster monster;
+        if (Math.random() < 0.5) {
+            monster = new RandomMonster(this, row, col);
+        } else {
+            monster = new ChasingMonster(this, row, col);
+        }
+        addGameObject(monster);
+    }
+
+    public void spawnGameObject() {
+        int row, col;
+        do {
+            row = (int)(Math.random() * height);
+            col = (int)(Math.random() * width);
+        } while (isOccupied(row,col));
+
+        if (Math.random() < 0.5) {
+            spawnMonster(row, col);
+        } else {
+            spawnBonus(row, col);
+        }
+    }
+
+    public boolean isOccupied(int row, int col) {
+        boolean occupied = false;
+        for (GameObject obj : objects) {
+            if (obj.getRow() == row && obj.getCol() == col) {
+                occupied = true;
+            }
+        }
+        return occupied;
+    }
+
+    public void draw() {
+        for (int i = 0; i < width; i++) System.out.print("----");
+        System.out.println("-");
+
+        for (int r = 0; r < height; r++) {
+            System.out.print("|"); 
+            for (int c = 0; c < width; c++) {
+                List<GameObject> cellObjects = new ArrayList<>();
+                for (GameObject obj : objects) {
+                    if (obj.getRow() == r && obj.getCol() == c) {
+                        cellObjects.add(obj);
+                    }
+                }
+
+                int printedCount = 0;
+                for (GameObject obj : cellObjects) {
+                    if (printedCount < 3) {
+                        System.out.print(turnPretty(obj.getSymbol()));
+                        printedCount++;
+                    }
+                }
+                while (printedCount < 3) {
+                    System.out.print(" ");
+                    printedCount++;
+                }
+                System.out.print("|"); 
+            }
+            System.out.println();
+            for (int i = 0; i < width; i++) System.out.print("----");
+            System.out.println("-");
+        }
+        
+        Hero h = getHero();
+        System.out.println("Health: " + h.getHealth() + " Score: " + h.getScore());
+    }
+
+    public static String turnPretty(char c) {
+        if (c == 'P') return HERO_SYMBOL;
+        else if (c == 'R') return RANDOM_MONSTER_SYMBOL;
+        else if (c == 'C') return CHASING_MONSTER_SYMBOL;
+        else if (c == 'H') return HEALTH_BONUS_SYMBOL;
+        else if (c == 'S') return SCORE_BONUS_SYMBOL;
+        return Character.toString(c);
+    }
+
+    public void update() {
+        for (GameObject obj : objects) {
+            obj.move();
+        }
+    }
+
+    public void checkAndHandleCollisions() {
+        Hero hero = getHero();
+
+        // 1. Hero vs Others
+        for (GameObject obj : objects) {
+            if (obj != hero) {
+                if (obj.getRow() == hero.getRow() && obj.getCol() == hero.getCol()) {
+                    hero.handleCollision(obj);
+                }
+            }
+        }
+        removeQueuedObjects();
+
+        // 2. Others vs Others
+        for (int i = 1; i < objects.size(); i++) { 
+            for (int j = i + 1; j < objects.size(); j++) {
+                GameObject o1 = objects.get(i);
+                GameObject o2 = objects.get(j);
+
+                if (o1.getRow() == o2.getRow() && o1.getCol() == o2.getCol()) {
+                    if (GameObject.doesSurviveOnCollision(o1, o2)) {
+                        removeGameObject(o2);
+                    } else {
+                        removeGameObject(o1);
+                    }
+                }
+            }
+        }
+        removeQueuedObjects();
+    }
+
+    public void removeQueuedObjects() {
+        for (GameObject obj : queuedObjectsForRemoval) {
+            this.objects.remove(obj);
+        }
+        queuedObjectsForRemoval.clear();
+    }
+}
+import java.util.Scanner;
+
+public class GameMgrRev {
+    public static final int GRID_WIDTH = 10;
+    public static final int GRID_HEIGHT = 6;
+    public static final int INITIAL_ENEMY_COUNT = 5;
+
+    public static void main(String[] args) {
+        // ARTIK GameGridRev KULLANIYORUZ
+        GameGridRev grid = new GameGridRev(GRID_WIDTH, GRID_HEIGHT);
+
+        for (int i = 0; i < INITIAL_ENEMY_COUNT; i++) {
+            grid.spawnGameObject();
+        }
+
+        Hero hero = grid.getHero();
+        Scanner in = new Scanner(System.in);
+
+        grid.draw();
+
+        boolean quit = false;
+        while (hero.isAlive() && !hero.isTargetReached() && !quit) {
+            System.out.print("Move (w/a/s/d/q): ");
+            char dir = in.next().charAt(0);
+            
+            if (dir == 'q') {
+                System.out.println("Quitting game...");
+                quit = true;
+            } else {
+                hero.setDirection(dir);
+                grid.update(); // Bonusların süresi burada azalır
+                grid.checkAndHandleCollisions();
+                if (Math.random() < 0.25) {
+                    grid.spawnGameObject(); // Yeni bonuslar Rev tipinde doğar
+                }
+                grid.draw();
+            }
+        }
+
+        if (hero.isTargetReached()) {
+            System.out.println(GameGridRev.WINNER_SYMBOL + "You win!");
+        }
+        else if (!hero.isAlive()) {
+            System.out.println(GameGridRev.LOSER_SYMBOL + "You lost!");
+        }
+
+        in.close();
+    }
+}
